@@ -1,0 +1,11 @@
+##导入数据，使用Rstudio,导入csv
+as.matrix() 转换为矩阵
+
+
+##把显示的内容输出到data.csv文件中
+sink("data.csv")
+data
+sink()
+
+##把df数据保存为data.csv文件
+write.csv(df,"data.csv")
