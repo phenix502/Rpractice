@@ -1,0 +1,35 @@
+#  计算权重
+CalculateWeight<-function(array){
+#  对矩阵每一行累积连乘
+  a<-apply(array,1,prod)
+#  开矩阵维数的次方
+  a<-a^(1/ncol(array))
+#  除以向量平均值
+  a/sum(a)
+}
+
+CalculateCR<-function(array,weight){
+  #  得出矩阵维数
+  n<-ncol(array)
+  #  计算AW
+  AW<-array%*%weight
+  #   计算最大特征根
+  landa<-mean(AW/weight)      
+  CI<-(landa-n)/(n-1)
+  #    根据维数得出RI
+  if(n==1) {RI=0}
+  if(n==2) {RI=0}
+  if(n==3) {RI=0.58}
+  if(n==4) {RI=0.90}
+  if(n==5) {RI=1.12}
+  if(n==6) {RI=1.24}
+  if(n==7) {RI=1.32}
+  if(n==8) {RI=1.41}
+  if(n==9) {RI=1.45}
+  if(n==10) {RI=1.49}
+  #    计算CR
+  CR<-CI/RI
+  output<-list(AW=AW,landa=landa,CI=CI,RI=RI,CR=CR,Weight=weight)
+  return(output)
+}
+
