@@ -1,0 +1,14 @@
+neg2pos<-function(array){
+  row=nrow(array)
+  col=ncol(array)
+     for(i in 1:row){
+       for(j in 1:col){
+         if(array[i,j]<0){
+           array[i,j]=(array[i,j])*(-1)
+         }
+        
+       }
+     }
+  result<-array
+  return(result)
+  }
