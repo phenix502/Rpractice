@@ -1,0 +1,6 @@
+##使用CTT包
+##df是一个矩阵
+reliability(df,itemal=TRUE)
+
+
+
