@@ -1,0 +1,119 @@
+ R语言处理数据:
+================
+## AHP两个关键函数的介绍：
+- Calculateweight是计算专家矩阵中，各个分类的权重
+```{r block1}
+CalculateWeight <- function(array) {
+    # 对矩阵每一行累积连乘
+    a <- apply(array, 1, prod)
+    # 开矩阵维数的次方
+    a <- a^(1/ncol(array))
+    # 除以向量平均值
+    a/sum(a)
+}
+```
+- CalculateCR是根据专家矩阵，和矩阵中各个分类的权重，计算CR,来完成一致性检验(CR<0.1)。
+```{r block2}
+
+    CalculateCR <- function(array, weight) {
+    # 得出矩阵维数
+    n <- ncol(array)
+    # 计算AW
+    AW <- array %*% weight
+    # 计算最大特征根
+    landa <- mean(AW/weight)
+    CI <- (landa - n)/(n - 1)
+    # 根据维数得出RI
+    if (n == 1) {
+        RI = 0
+    }
+    if (n == 2) {
+        RI = 0
+    }
+    if (n == 3) {
+        RI = 0.58
+    }
+    if (n == 4) {
+        RI = 0.9
+    }
+    if (n == 5) {
+        RI = 1.12
+    }
+    if (n == 6) {
+        RI = 1.24
+    }
+    if (n == 7) {
+        RI = 1.32
+    }
+    if (n == 8) {
+        RI = 1.41
+    }
+    if (n == 9) {
+        RI = 1.45
+    }
+    if (n == 10) {
+        RI = 1.49
+    }
+    # 计算CR
+    CR <- CI/RI
+    output <- list(AW = AW, landa = landa, CI = CI, RI = RI, CR = CR, Weight = weight)
+    return(output)
+}
+    
+```
+## 利用上面两个函数，对专家矩阵进行处理
+1. 输入专家矩阵
+```{r block3}
+     # 目标层矩阵：培养顾客忠诚
+    top<-array(c(1,1/2,1/2,1/2,2,1,1/2,1/2,2,2,1,1/2,2,2,2,1),dim=c(4,4));top
+    #  准则层矩阵1：增加会员在网时间
+    B1<-array(c(1,1/2,1/2,1/2,1/2,2,1,1/2,1/2,1/2,2,2,1,1/2,1/2,2,2,2,1,1/2,2,2,2,2,1),dim=c(5,5));B1
+    #  准则层矩阵2：刺激重复购买
+    B2<-array(c(1,1/2,1/2,1/3,1/2,2,1,1/3,1/3,1/2,2,3,1,1/2,1/2,3,3,2,1,1/2,2,2,2,2,1),dim=c(5,5));B2
+    #  准则层矩阵3：刺激顾客参与互动
+    B3<-array(c(1,1/2,1/2,1/2,2,1,1/2,1/2,2,2,1,1,2,2,1,1),dim=c(4,4));B3
+    #  准则层矩阵4：增加转移成本
+    B4<-array(c(1,1/2,1/2,1/2,1,2,1,1/3,1/3,1/2,2,3,1,1/2,1,2,3,1,1/2,1,2,3,2,1,1,1,2,1,1,1),dim=c(5,5));B4
+    
+```
+2. 计算各个矩阵的权重
+```{r block4}
+
+    top.weight<-CalculateWeight(top);top.weight
+    B1.weight<-CalculateWeight(B1);B1.weight
+    B2.weight<-CalculateWeight(B2);B2.weight
+    B3.weight<-CalculateWeight(B3);B3.weight
+    B4.weight<-CalculateWeight(B4);B4.weight
+```
+3. 检验CR是否<0.1,如果是则通过一致性检验
+```{r block5}
+
+   top.result<-CalculateCR(top,top.weight);top.result$CR
+   B1.result<-CalculateCR(B1,B1.weight);B1.result$CR
+   B2.result<-CalculateCR(B2,B2.weight);B2.result$CR
+   B3.result<-CalculateCR(B3,B3.weight);B3.result$CR
+   B4.result<-CalculateCR(B4,B4.weight);B4.result $CR
+```
+4. 计算综合排名，由于B3(**激励顾客参与互动**，不涉及到**优惠券**)是个4乘以4的矩阵,而其他的矩阵是一个5乘以5的矩阵。所以在向量第二个位置（**优惠券**）上补零
+```{r block6}
+    B3.weight <- append(B3.weight, 0, after = 1);B3.weight
+
+```
+5. 把B1~B4的权重向量合并成矩阵C里面
+```{r block7}
+
+    C <- cbind(B1.weight, B2.weight, B3.weight, B4.weight)
+```
+6.计算综合排名
+```{r block8}
+  AHP <- C %*% top.weight;AHP
+```
+7. 对综合排名进行一致性检验
+```{r block9}
+  CI<-c(B1.result$CI,B2.result$CI,B3.result$CI,B4.result$CI)
+  RI <- c(1.12, 1.12, 0.9, 1.12)
+  CR <- (top.weight %*% CI)/(top.weight %*% RI);CR  
+```
+
+
+
