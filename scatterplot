@@ -1,0 +1,10 @@
+plot(cars$dist~cars$speed, # y~x
+     main="Relationship between car distance & speed",# plot Title
+     xlab="Speed (miles per hour)", # X axis title
+     ylab="Distance travelled(miles)",# Y axis title
+     xlim=c(0,30),# Set x axis limits limits from 0 to  30
+     ylim=c(0,140),# Set y axis limits from 0 to  140
+     xaxs="i", # Set x axis style as internal
+     yaxs="i",#Set y axis style as internal
+     col="red",#set the color of plotting symbol to red
+     pch=19) #set the plotting symbol to filled dots
